@@ -1,0 +1,22 @@
+﻿{
+  "firestore": {
+    "rules": "backend/db/firestore.rules",
+    "indexes": "backend/db/firestore.indexes.json"
+  },
+  "functions": {
+    "source": "backend/functions",
+    "runtime": "nodejs18"
+  },
+  "emulators": {
+    "firestore": {
+      "port": 8080
+    },
+    "functions": {
+      "port": 5001
+    },
+    "ui": {
+      "enabled": true,
+      "port": 4000
+    }
+  }
+}
