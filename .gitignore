@@ -1,0 +1,25 @@
+﻿# Flutter
+**/flutter_modules/
+
+# Firebase
+**/firebase-debug.log
+**/firebase-debug.*.log
+*.firebaserc
+
+# Android
+**/android/**/GeneratedPluginRegistrant.java
+
+# iOS
+**/ios/**/Pods/
+**/ios/**/Flutter/Generated.xcconfig
+**/ios/**/Flutter/flutter_export_environment.sh
+
+# General
+.DS_Store
+.dart_tool/
+.idea/
+.vscode/
+.packages
+.pub-cache/
+.pub/
+/build/
