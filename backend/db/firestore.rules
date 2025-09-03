@@ -1,0 +1,187 @@
+﻿// /backend/db/firestore.rules
+// Regras de segurança do Firestore detalhadas para StellaPro
+// Versão comentada, incluindo exemplos de campos e permissões CRUD
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =========================================================
+    // Coleção: clientes
+    // =========================================================
+    match /clientes/{clienteId} {
+      // Exemplo de campos:
+      // nome, email, cpf, dataNascimento, telefones[], endereco, createdAt
+      allow create: if request.auth != null;
+      allow read, update: if request.auth != null && request.auth.uid == clienteId;
+      allow delete: if false; // clientes não podem se auto-excluir
+
+      // Sub-coleção: imagensEstofado
+      match /imagensEstofado/{imagemId} {
+        // Campos: urlImagem, descricao, uploadedAt
+        allow create, read, update, delete:
+          if request.auth != null && request.auth.uid == clienteId;
+      }
+
+      // Sub-coleção: assinatura
+      match /assinatura/{assinaturaId} {
+        // Campos: assinaturaBase64, dataAssinatura
+        allow create, read, update, delete:
+          if request.auth != null && request.auth.uid == clienteId;
+      }
+    }
+
+    // =========================================================
+    // Coleção: estofarias
+    // =========================================================
+    match /estofarias/{estofariaId} {
+      // Campos: nome, cnpj, enderecos[], telefones[], funcionarios[], createdAt
+      allow read: if request.auth != null;
+      allow create: if request.auth != null; // admin cria no console
+      allow update, delete: if request.auth != null && request.auth.token.estofariaId == estofariaId;
+
+      // Sub-coleção: funcionarios
+      match /funcionarios/{funcionarioId} {
+        // Campos: nome, cargo, email, telefones[], permissoes[], createdAt
+        allow create, read, update, delete:
+          if request.auth != null && request.auth.token.estofariaId == estofariaId;
+      }
+
+      // Sub-coleção: custosFixos
+      match /custosFixos/{custoId} {
+        // Campos: aluguel, agua, luz, manutencaoEquipamentos, mediaMensal, createdAt
+        allow create, read, update, delete:
+          if request.auth != null && request.auth.token.estofariaId == estofariaId;
+      }
+
+      // Sub-coleção: logistica
+      match /logistica/{veiculoId} {
+        // Campos: placa, veiculoModelo, quilometragemAtual, gastoCombustivel, mediaKm, createdAt
+        allow create, read, update, delete:
+          if request.auth != null && request.auth.token.estofariaId == estofariaId;
+      }
+    }
+
+    // =========================================================
+    // Coleção: fornecedores
+    // =========================================================
+    match /fornecedores/{fornecedorId} {
+      // Campos: nome, cnpj, tecidos[], enderecos[], telefones[], createdAt
+      allow read: if request.auth != null;
+      allow create: if request.auth != null; // admin cria no console
+      allow update, delete:
+        if request.auth != null && request.auth.token.fornecedorId == fornecedorId;
+
+      // Sub-coleção: tecidos
+      match /tecidos/{tecidoId} {
+        // Campos: nomeTecido, descricao, urlImagem, preco, estoque
+        allow create, read, update, delete:
+          if request.auth != null && request.auth.token.fornecedorId == fornecedorId;
+      }
+    }
+
+    // =========================================================
+    // Coleção: pedidosOrcamento
+    // =========================================================
+    match /pedidosOrcamento/{pedidoId} {
+      // Campos: clienteId, estofariaId, dataSolicitacao, status, codigoPedido
+      allow create: if request.auth != null;
+      allow read, update:
+        if request.auth != null &&
+        (request.auth.uid == resource.data.clienteId || request.auth.token.estofariaId == resource.data.estofariaId);
+      allow delete: if false;
+
+      // Sub-coleção: orcamentos
+      match /orcamentos/{orcamentoId} {
+        // Campos: valorTotal, itens[], status, codigoOrcamento, dataEnvio
+        allow create, read, update:
+          if request.auth != null &&
+          (request.auth.uid == resource.data.clienteId || request.auth.token.estofariaId == resource.data.estofariaId);
+        allow delete: if false;
+      }
+    }
+
+    // =========================================================
+    // Coleção: ordensServico
+    // =========================================================
+    match /ordensServico/{osId} {
+      // Campos: clienteId, estofariaId, dataCriacao, status, codigoOS, valorTotal
+      allow create, read, update:
+        if request.auth != null &&
+        (request.auth.uid == resource.data.clienteId || request.auth.token.estofariaId == resource.data.estofariaId);
+      allow delete: if false;
+
+      // Sub-coleção: contratos
+      match /contratos/{contratoId} {
+        // Campos: codigoContrato, osId, clienteId, estofariaId, dataAssinatura, pdfUrl
+        allow create, read, update, delete:
+          if request.auth != null &&
+          (request.auth.uid == resource.data.clienteId || request.auth.token.estofariaId == resource.data.estofariaId);
+      }
+
+      // Sub-coleção: producao
+      match /producao/{producaoId} {
+        // Campos: estofadoId, dataInicio, dataFim, status, observacoes
+        allow create, read, update, delete:
+          if request.auth != null && request.auth.token.estofariaId == resource.data.estofariaId;
+      }
+
+      // Sub-coleção: checklists
+      match /checklists/{checklistId} {
+        // Campos: producaoId, itensVerificados[], aprovado, dataCheck
+        allow create, read, update, delete:
+          if request.auth != null && request.auth.token.estofariaId == resource.data.estofariaId;
+      }
+
+      // Sub-coleção: fotosAntesDepois
+      match /fotos/{fotoId} {
+        // Campos: antesUrl, depoisUrl, dataUpload
+        allow create, read, update, delete:
+          if request.auth != null && request.auth.token.estofariaId == resource.data.estofariaId;
+      }
+    }
+
+    // =========================================================
+    // Coleção: comprasFornecedor
+    // =========================================================
+    match /comprasFornecedor/{compraId} {
+      // Campos: estofariaId, fornecedorId, itens[], valorTotal, dataCompra
+      allow create, read, update:
+        if request.auth != null &&
+        (request.auth.token.estofariaId == resource.data.estofariaId ||
+         request.auth.token.fornecedorId == resource.data.fornecedorId);
+      allow delete: if false;
+    }
+
+    // =========================================================
+    // Coleção: financeiro
+    // =========================================================
+    match /financeiro/{financeiroId} {
+      // Campos: estofariaId, receita[], despesas[], saldoAtual, dataRegistro
+      allow create, read, update:
+        if request.auth != null && request.auth.token.estofariaId == resource.data.estofariaId;
+      allow delete: if false;
+    }
+
+    // =========================================================
+    // Coleção: tributario
+    // =========================================================
+    match /tributario/{tributarioId} {
+      // Campos: estofariaId, regrasVigentes[], impostosCalculados[], dataAtualizacao
+      allow create, read, update:
+        if request.auth != null && request.auth.token.estofariaId == resource.data.estofariaId;
+      allow delete: if false;
+    }
+
+    // =========================================================
+    // Coleção: notificacoes
+    // =========================================================
+    match /notificacoes/{notificacaoId} {
+      // Campos: tipo, destinatarioId, mensagem, status, dataEnvio
+      allow create, read, update:
+        if request.auth != null &&
+        (request.auth.uid == resource.data.clienteId || request.auth.token.estofariaId == resource.data.estofariaId);
+      allow delete: if false;
+    }
+  }
+}
