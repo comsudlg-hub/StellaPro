@@ -1,12 +1,12 @@
 ﻿import "package:flutter/material.dart";
-import "signup_screen.dart";
-import "dashboard_screen.dart";
 
-class LoginScreen extends StatelessWidget {
+class SignupScreen extends StatelessWidget {
+  final TextEditingController nomeController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController senhaController = TextEditingController();
+  final TextEditingController confirmarSenhaController = TextEditingController();
 
-  LoginScreen({super.key});
+  SignupScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,7 @@ class LoginScreen extends StatelessWidget {
                 // Título
                 const SizedBox(height: 20),
                 const Text(
-                  "Acessar StellaPro",
+                  "Criar Nova Conta",
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -49,12 +49,32 @@ class LoginScreen extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
+                      // Campo Nome Completo
+                      TextFormField(
+                        controller: nomeController,
+                        decoration: InputDecoration(
+                          labelText: "Nome Completo",
+                          hintText: "Digite seu nome completo",
+                          labelStyle: const TextStyle(color: Color(0xFF42585c)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Color(0xFF9c8158)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Color(0xFF9c8158), width: 2),
+                          ),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 20),
+                      
                       // Campo Email
                       TextFormField(
                         controller: emailController,
                         decoration: InputDecoration(
                           labelText: "Email",
-                          hintText: "Digite seu e-mail",
+                          hintText: "Digite seu email",
                           labelStyle: const TextStyle(color: Color(0xFF42585c)),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -71,11 +91,32 @@ class LoginScreen extends StatelessWidget {
                       
                       // Campo Senha
                       TextFormField(
-                        controller: passwordController,
+                        controller: senhaController,
                         obscureText: true,
                         decoration: InputDecoration(
                           labelText: "Senha",
-                          hintText: "Digite sua senha",
+                          hintText: "Crie uma senha segura",
+                          labelStyle: const TextStyle(color: Color(0xFF42585c)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Color(0xFF9c8158)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Color(0xFF9c8158), width: 2),
+                          ),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 20),
+                      
+                      // Campo Confirmar Senha
+                      TextFormField(
+                        controller: confirmarSenhaController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: "Confirmar Senha",
+                          hintText: "Digite a senha novamente",
                           labelStyle: const TextStyle(color: Color(0xFF42585c)),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -90,7 +131,7 @@ class LoginScreen extends StatelessWidget {
                       
                       const SizedBox(height: 30),
                       
-                      // Botão Entrar
+                      // Botão Cadastrar
                       Container(
                         width: MediaQuery.of(context).size.width * 0.5,
                         decoration: BoxDecoration(
@@ -107,10 +148,8 @@ class LoginScreen extends StatelessWidget {
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => DashboardScreen()),
-                            );
+                            // TODO: Implementar cadastro
+                            Navigator.pop(context); // Volta para login
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
@@ -118,7 +157,7 @@ class LoginScreen extends StatelessWidget {
                             minimumSize: const Size(double.infinity, 50),
                           ),
                           child: const Text(
-                            "Entrar",
+                            "Cadastrar",
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -130,35 +169,16 @@ class LoginScreen extends StatelessWidget {
                       
                       const SizedBox(height: 20),
                       
-                      // Link para Cadastro
+                      // Link para Login
                       TextButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => SignupScreen()),
-                          );
+                          Navigator.pop(context); // Volta para login
                         },
                         child: const Text(
-                          "Criar nova conta",
+                          "Já tem uma conta? Fazer login",
                           style: TextStyle(
                             color: Color(0xFF42585c),
                             decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
-                      
-                      const SizedBox(height: 10),
-                      
-                      // Link para Recuperar Senha
-                      TextButton(
-                        onPressed: () {
-                          // TODO: Implementar recuperação de senha
-                        },
-                        child: const Text(
-                          "Esqueci minha senha",
-                          style: TextStyle(
-                            color: Color(0xFF42585c),
-                            fontSize: 14,
                           ),
                         ),
                       ),
