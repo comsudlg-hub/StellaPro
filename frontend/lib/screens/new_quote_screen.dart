@@ -14,36 +14,38 @@ class _NewQuoteScreenState extends State<NewQuoteScreen> {
   final _serviceDescriptionController = TextEditingController();
   final _priceController = TextEditingController();
 
-  String _selectedFabric = "";
+  String? _selectedFabric; // Alterado para String? nullable
   String _selectedPriority = "normal";
   bool _isAutoPricing = true;
   double _suggestedPrice = 0.0;
 
-  final List<String> _fabrics = [
-    "Couro sintético preto - R\$ 85/m",
-    "Linho bege - R\$ 120/m", 
-    "Veludo azul - R\$ 150/m",
-    "Suede marrom - R\$ 180/m",
-    "Tecido técnico - R\$ 200/m"
+  // Lista simplificada com valores únicos
+  final List<Map<String, dynamic>> _fabrics = [
+    {"name": "Couro sintético preto", "price": 85.0, "display": "Couro sintético preto - R\$ 85/m"},
+    {"name": "Linho bege", "price": 120.0, "display": "Linho bege - R\$ 120/m"},
+    {"name": "Veludo azul", "price": 150.0, "display": "Veludo azul - R\$ 150/m"},
+    {"name": "Suede marrom", "price": 180.0, "display": "Suede marrom - R\$ 180/m"},
+    {"name": "Tecido técnico", "price": 200.0, "display": "Tecido técnico - R\$ 200/m"}
   ];
-
-  final Map<String, double> _fabricPrices = {
-    "Couro sintético preto - R\$ 85/m": 85.0,
-    "Linho bege - R\$ 120/m": 120.0,
-    "Veludo azul - R\$ 150/m": 150.0,
-    "Suede marrom - R\$ 180/m": 180.0,
-    "Tecido técnico - R\$ 200/m": 200.0
-  };
 
   @override
   void initState() {
     super.initState();
+    // Definir um valor inicial válido
+    if (_fabrics.isNotEmpty) {
+      _selectedFabric = _fabrics[0]["name"];
+    }
     _calculateSuggestedPrice();
   }
 
   void _calculateSuggestedPrice() {
-    // Cálculo automático baseado em tecido + mão de obra + margem
-    double fabricCost = _fabricPrices[_selectedFabric] ?? 0.0;
+    // Encontrar o tecido selecionado
+    final selectedFabric = _fabrics.firstWhere(
+      (fabric) => fabric["name"] == _selectedFabric,
+      orElse: () => _fabrics[0],
+    );
+
+    double fabricCost = selectedFabric["price"] ?? 0.0;
     double laborCost = 250.0; // Valor base mão de obra
     double profitMargin = 1.4; // 40% de margem
     double stellaCommission = 1.1; // 10% comissão
@@ -74,7 +76,6 @@ class _NewQuoteScreenState extends State<NewQuoteScreen> {
       double percentage = (_suggestedPrice > 0) ? (difference / _suggestedPrice * 100) : 0;
 
       if (percentage > 20) {
-        // Alertar sobre valor muito abaixo
         _showPriceWarning(percentage);
       }
     }
@@ -217,14 +218,14 @@ class _NewQuoteScreenState extends State<NewQuoteScreen> {
                   ),
                 ),
                 items: _fabrics.map((fabric) {
-                  return DropdownMenuItem(
-                    value: fabric,
-                    child: Text(fabric),
+                  return DropdownMenuItem<String>(
+                    value: fabric["name"], // Valor único para cada item
+                    child: Text(fabric["display"]),
                   );
                 }).toList(),
                 onChanged: (value) {
                   setState(() {
-                    _selectedFabric = value!;
+                    _selectedFabric = value;
                     _calculateSuggestedPrice();
                   });
                 },
